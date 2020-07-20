@@ -10,7 +10,7 @@ curs = conn.cursor()
 sql = """insert into tab_hc(title,contents,answer,tag)
          values (%s, %s, %s, %s)"""
 
-ran = range(4, 10)  # url 뒤에 붙을 숫자 범위
+ran = range(1, 11057)  # url 뒤에 붙을 숫자 범위
 url = "https://hashcode.co.kr/questions/"
 url_list = []
 

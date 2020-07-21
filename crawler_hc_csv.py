@@ -1,8 +1,10 @@
+import itertools
+
 import requests
 import pandas as pd
 from bs4 import BeautifulSoup
 # url 뒤에 붙을 숫자 범위
-ran = range(1, 11069)
+ran = range(1, 11071)
 url = "https://hashcode.co.kr/questions/"
 # url 뒤에 지정한 범위 내의 숫자를 붙여 배열에 저장
 url_list = []
@@ -21,18 +23,34 @@ for url in url_list:
     #본문 추출
     contents = soup.select(
         'body > div.main > div.content > div.content-wrap > div.center > div.content.question-body > div.markdown')
-    #답변 추출
+    #답변 추출 (답변과 그의 댓글을 함께 추출한다)
     answers = soup.select(
-        'div.answer-wrap > ul.answers-list > li > div.center > div.markdown')
+        'ul.answers-list > li.answer-item > div.center')
+
 
     list=[]
     # 답변이 존재할 경우
     if answers:
         # 배열 형태인 답변들을 text 형으로 전환
         for answer in answers:
-            list.append(answer.text)
-        # 답변들을 구분해줄 문자열(<------->)을 사이에 추가한다.
-        answer_str = "\n\n<-------------------------------->\n\n".join(list)
+            # 답변 본문 추출
+            answer_markdown=answer.find_all(attrs={'class':'markdown'})
+            # 답변의 댓글 추출
+            answer_comment=answer.find_all(attrs={'class':'comment-content'})
+            # list에 답변 본문 삽입
+            list.append(answer_markdown[0].text)
+            # list에 댓글 구분자 삽입
+            list.append("\n\n<---------댓글----------->\n")
+            # list에 댓글 삽입
+            for ans in answer_comment:
+                list.append(ans.text)
+
+            # 각 답변을 구분하는 구분자 삽입
+            list.append('\n*************************************************************\n')
+
+        # 모든 답변, 댓글 사이의 간격 삽입, 리스트 합치기
+        answer_str = "\n\n".join(list)
+
     # 답변이 존재하지 않을 경우 예외 처리
     if not answers:
         answer_str = "No Answers Exist"

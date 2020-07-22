@@ -1,5 +1,4 @@
 import itertools
-
 import requests
 import pandas as pd
 from bs4 import BeautifulSoup
@@ -23,38 +22,33 @@ for url in url_list:
     #본문 추출
     contents = soup.select(
         'body > div.main > div.content > div.content-wrap > div.center > div.content.question-body > div.markdown')
-    #답변 추출 (답변과 그의 댓글을 함께 추출한다)
+    #답변 추출
     answers = soup.select(
         'ul.answers-list > li.answer-item > div.center')
-
-
     list=[]
     # 답변이 존재할 경우
     if answers:
         # 배열 형태인 답변들을 text 형으로 전환
         for answer in answers:
-            # 답변 본문 추출
+            #답변의 본문 부분을 파싱
             answer_markdown=answer.find_all(attrs={'class':'markdown'})
-            # 답변의 댓글 추출
+            #각각 답변에 대한 댓글 부분을 파싱
             answer_comment=answer.find_all(attrs={'class':'comment-content'})
-            # list에 답변 본문 삽입
+            # 새로운 리스트에 본문과 그에대한 댓글을 병합(merge)
+            # 새로운 리스트에 본문추가
             list.append(answer_markdown[0].text)
-            # list에 댓글 구분자 삽입
+            # 답변과 그에대한 댓글들을 구분해줄 문자열(<----댓글--->)을 사이에 추가한다.
             list.append("\n\n<---------댓글----------->\n")
-            # list에 댓글 삽입
+            # 새로운 리스트에 댓글들 추가
             for ans in answer_comment:
                 list.append(ans.text)
-
-            # 각 답변을 구분하는 구분자 삽입
+            # 답변들을 구분해줄 문자열(*************)을 사이에 추가한다.
             list.append('\n*************************************************************\n')
-
-        # 모든 답변, 댓글 사이의 간격 삽입, 리스트 합치기
+        #전체 답변에 대한 리스트 전체를 문자열로 형변환한다.
         answer_str = "\n\n".join(list)
-
     # 답변이 존재하지 않을 경우 예외 처리
     if not answers:
         answer_str = "No Answers Exist"
-
     # 태그 추출
     tag = soup.select(
         'body > div.main > div.content > div.content-wrap > div.center > div.question-tags')

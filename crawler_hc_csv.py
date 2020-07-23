@@ -3,7 +3,7 @@ import pandas as pd
 from bs4 import BeautifulSoup
 
 # url 뒤에 붙을 숫자 범위
-ran = range(1, 11075)
+ran = range(1,11080)
 url = "https://hashcode.co.kr/questions/"
 
 # url 뒤에 지정한 범위 내의 숫자를 붙여 배열에 저장
@@ -56,6 +56,19 @@ for url in url_list:
     if not answers:
         answer_str = "No Answers Exist"
 
+        for item in zip(title, contents, mcom_str, answer_str, tag):
+            data_list.append(
+                {
+                    '글번호': title_num,
+                    '제목': item[0].text,
+                    '본문': item[1].text,
+                    '본문 댓글': mcom_str,
+                    '답변': answer_str,
+                    '답변 번호': "-",
+                    '댓글': "-",
+                    '태그': item[4].text.replace('\n', '').replace('\t', '').replace('  ', '')
+                }
+            )
     # 답변이 존재할 경우
     if answers:
         answer_num = 0    # 답변 번호 저장하는 변수

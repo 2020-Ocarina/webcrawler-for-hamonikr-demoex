@@ -13,7 +13,7 @@ for r in ran:
 
 data_list = []  # 전체 데이터 저장하는 리스트
 
-title_num = 1   # 글번호 저장하는 변수
+title_num = 1  # 글번호 저장하는 변수
 
 for url in url_list:
 
@@ -23,16 +23,16 @@ for url in url_list:
     req = requests.get(url)
     html = req.text
     soup = BeautifulSoup(html, 'html.parser')
-    #제목 추출
+    # 제목 추출
     title = soup.select('body > div.main > div.content > div.content-wrap > div.center > h2 > a')
-    #본문 추출
+    # 본문 추출
     contents = soup.select(
         'body > div.main > div.content > div.content-wrap > div.center > div.content.question-body > div.markdown')
     # 본문댓글 추출
     main_comment = soup.select(
         'body > div.main > div.content > div.content-wrap > div.center > div.comments-wrap > ul.comments > li.comment > span.comment-content')
     # 댓글이 존재할 경우
-    mcomlist = []   # 댓글 저장하는 리스트
+    mcomlist = []  # 댓글 저장하는 리스트
     if main_comment:
         # 배열 형태인 댓글들을 text 형으로 전환
         for mcom in main_comment:
@@ -49,7 +49,7 @@ for url in url_list:
     if not tag:
         tag = "No Tags Exist"
 
-    #답변 추출
+    # 답변 추출
     answers = soup.select(
         'ul.answers-list > li.answer-item > div.center')
     # 답변이 존재하지 않을 경우 예외 처리
@@ -58,15 +58,15 @@ for url in url_list:
 
     # 답변이 존재할 경우
     if answers:
-        answer_num = 0    # 답변 번호 저장하는 변수
+        answer_num = 0  # 답변 번호 저장하는 변수
 
         for answer in answers:
             # 답변번호 증가
             answer_num += 1
             # 답변의 본문 부분을 파싱
-            answer_markdown = answer.find_all(attrs={'class':'markdown'})
+            answer_markdown = answer.find_all(attrs={'class': 'markdown'})
             # 각각 답변에 대한 댓글 부분을 파싱
-            answer_comment = answer.find_all(attrs={'class':'comment-content'})
+            answer_comment = answer.find_all(attrs={'class': 'comment-content'})
 
             # 댓글이 없을 경우
             if len(answer_comment) < 1:
@@ -107,9 +107,6 @@ for url in url_list:
 
     # 글번호 증가
     title_num += 1
-
-
-
 
 # 추출한 데이터 csv파일 형태로 저장
 data = pd.DataFrame(data_list)

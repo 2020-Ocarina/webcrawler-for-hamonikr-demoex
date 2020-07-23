@@ -28,14 +28,16 @@ for url in url_list:
     #본문 추출
     contents = soup.select(
         'div.content > div.field.field-name-body.field-type-text-with-summary.field-label-hidden > div')
-    #답변 추출
-    answers = soup.select('div.comment')
+
     #태그 추출
     tags = soup.select('div.content > div.field.field-name-taxonomy-forums.field-type-taxonomy-term-reference.field-label-above > div.field-items > div > a')
     if not tags:
         tag_str="No tags Exist"
     if tags:
         tag_str=tags[0].text
+
+    # 답변 추출
+    answers = soup.select('div.comment')
     # 답변이 존재하지 않을 경우 예외 처리
     if not answers:
         answer_str = "No Answers Exist"
@@ -86,8 +88,6 @@ for url in url_list:
     # 글번호 증가
     title_num += 1
 #모든 페이지 루프 끝
-
-
 
 # 추출한 데이터 csv파일 형태로 저장
 data = pd.DataFrame(data_list)

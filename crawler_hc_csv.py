@@ -1,19 +1,28 @@
 import requests
 import pandas as pd
 from bs4 import BeautifulSoup
+from urllib.request import urlopen
+from datetime import datetime
+from datetime import timedelta
 
-# url 뒤에 붙을 숫자 범위
-ran = range(1,11080)
-url = "https://hashcode.co.kr/questions/"
-
-# url 뒤에 지정한 범위 내의 숫자를 붙여 배열에 저장
+url = "https://hashcode.co.kr"
+soup = BeautifulSoup(urlopen(url), 'html.parser')
+article_list = soup.select('ul.question-list > li.question-list-item')
 url_list = []
-for r in ran:
-    url_list.append(url + str(r))
+yesterday = (datetime.today()-timedelta(1)).strftime("%Y-%m-%d")
+for row in article_list:
+    link = row.select('div.question > div.top > h4 > a')[0]
+    published_at = row.select('div.question > ul.question-info.float-xs-right > li:nth-of-type(2) > time')[0]
+    time = published_at.attrs['datetime']
+    if yesterday in time:
+        url_list.append(url+link.attrs['href'])
 
-data_list = []  # 전체 데이터 저장하는 리스트
 
-title_num = 1  # 글번호 저장하는 변수
+
+
+# 전체 데이터 저장하는 리스트
+data_list = []
+
 
 for url in url_list:
 
@@ -23,6 +32,9 @@ for url in url_list:
     req = requests.get(url)
     html = req.text
     soup = BeautifulSoup(html, 'html.parser')
+
+    # 글번호 추출
+    title_num = soup.select('body > div.main > div.content > div.content-wrap > div.center > div.comments-wrap')[0].attrs['id']
     # 제목 추출
     title = soup.select('body > div.main > div.content > div.content-wrap > div.center > h2 > a')
     # 본문 추출
@@ -118,9 +130,8 @@ for url in url_list:
                             }
                         )
 
-    # 글번호 증가
-    title_num += 1
+
 
 # 추출한 데이터 csv파일 형태로 저장
 data = pd.DataFrame(data_list)
-data.to_csv('crawling_hashcode.csv')
+data.to_csv('/home/yeji/PycharmProjects/pythonProject/crawling_hashcode_'+yesterday+'.csv')
